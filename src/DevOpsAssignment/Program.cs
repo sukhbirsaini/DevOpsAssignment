@@ -5,10 +5,11 @@ namespace DevOpsAssignment
 {
     public class Program
     {
-        static void Main(string[] args)
+        static  Main(string[] args)
         {
             var name = args.Any() ? args[0] : "World";
             Console.WriteLine(SayHello(name));
+
         }
 
         public static string SayHello(string name)
