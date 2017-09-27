@@ -61,10 +61,8 @@ Task("Artifacts")
 	.Does(() =>
 	{
 		MSBuild("./src/DevOpsAssignment/DevOpsAssignment.csproj", new MSBuildSettings()
-		  .WithProperty("DeployOnBuild", "true")
-		  .WithProperty("WebPublishMethod", "Package")
-		  .WithProperty("PackageAsSingleFile", "true")
-		  .WithProperty("SkipInvalidConfigurations", "true"));
+                      .SetConfiguration("Release")
+      );
 	});
 
 
