@@ -1,5 +1,5 @@
+#tool "nuget:?package=OpenCover"
 #tool "nuget:?package=xunit.runner.console"
-
 
 // ARGUMENTS
 
@@ -8,7 +8,7 @@ var configuration = Argument("configuration", "Release");
 
 
 Task("Default")
-  .IsDependentOn("xUnit");
+  .IsDependentOn("Artifacts");
 
 Task("Build")
   .IsDependentOn("Restore-NuGet-Packages")
@@ -39,5 +39,33 @@ Task("xUnit")
 {
   XUnit2("./src/DevOpsAssignment.Tests/bin/Debug/DevOpsAssignment.Tests.dll");
 });
+
+Task("Coverage")
+	.IsDependentOn("xUnit")
+	.Does(() =>
+	{
+		OpenCover(tool => {
+		  tool.XUnit2("./src/DevOpsAssignment.Tests/bin/Debug/DevOpsAssignment.Tests.dll",
+        new XUnit2Settings {
+          ShadowCopy = false
+        });
+		  },
+		  new FilePath("./coverage.xml"),
+		  new OpenCoverSettings()
+			.WithFilter("+[DevOpsAssignment]*")
+      .WithFilter("-[DevOpsAssignment.Tests]*"));
+	});
+	
+Task("Artifacts")
+	.IsDependentOn("Coverage")
+	.Does(() =>
+	{
+		MSBuild("./src/DevOpsAssignment/DevOpsAssignment.csproj", new MSBuildSettings()
+		  .WithProperty("DeployOnBuild", "true")
+		  .WithProperty("WebPublishMethod", "Package")
+		  .WithProperty("PackageAsSingleFile", "true")
+		  .WithProperty("SkipInvalidConfigurations", "true"));
+	});
+
 
 RunTarget(target);
